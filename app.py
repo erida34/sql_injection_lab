@@ -5,6 +5,9 @@ import os
 app = Flask(__name__)
 DB_PATH = "database.db"
 
+admin_username = "Volkodavov"
+admin_pass = "qwerty12345"
+
 
 def init_db():
     if os.path.exists(DB_PATH):
@@ -46,9 +49,8 @@ def init_db():
         )
 
     test_secrets = [
-        ("internal_api_key", "AKIA_TEST_9F3K2L1M"),
-        ("jwt_signing_key", "dev_jwt_key_change_me"),
-        ("smtp_password", "smtp-pass-2025"),
+        ("admin_username", admin_username),
+        ("admin_pass", admin_pass),
     ]
     for name, secret in test_secrets:
         cursor.execute(
@@ -58,7 +60,6 @@ def init_db():
 
     conn.commit()
     conn.close()
-    print("db is inited")
 
 
 def get_connection():
@@ -81,7 +82,7 @@ def index():
         conn = get_connection()
         cursor = conn.cursor()
 
-        # ⚠️ УЯЗВИМОСТЬ: конкатенация пользовательского ввода
+        # TODO ⚠️ УЯЗВИМОСТЬ: конкатенация пользовательского ввода
         sql = (
             f"SELECT name, category, price FROM products WHERE name LIKE '%{query}%' ORDER BY rowid;"
         )
@@ -113,10 +114,9 @@ def create():
         conn = get_connection()
         cursor = conn.cursor()
 
-        # ⚠️ УЯЗВИМОСТЬ: конкатенация в INSERT (price без кавычек)
+        # TODO ⚠️ УЯЗВИМОСТЬ: конкатенация в INSERT (price без кавычек)
         sql = (
-            "INSERT INTO products (name, category, price) "
-            f"VALUES ('{name}', '{category}', {price})"
+            f"INSERT INTO products (name, category, price) VALUES ('{name}', '{category}', {price})"
         )
 
         cursor.execute(sql)
